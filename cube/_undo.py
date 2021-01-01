@@ -3,16 +3,18 @@ Virtual Cube Program - Made by Fred Lang.
 Undo method.
 '''
 
+from cube.functions import reverse
+
 #Undo
 def undo(self, number=1):
-    if type(number) is str:
+    if isinstance(number, str):
         #Undo all
         if number.upper() == 'ALL':
-            size = self.size
-            self.cube = [[[i]*size for x in range(size)] for i in 'ULFRBD']
-            for smove in self.smoves:
-                self.move(smove)
+            smoves = self.smoves
+            self.reset(self.size)
 
+            self.smoves = smoves
+            self.move(smoves)
             self.moves = []
             return
 
@@ -23,10 +25,8 @@ def undo(self, number=1):
         else:
             raise TypeError
 
-    elif not type(number) is int:
+    elif not isinstance(number, int):
         raise TypeError
 
-    for move in self.reverse(self.moves[-number:]):
-        self.move(move)
-
+    self.move(reverse(self.moves[-number:]))
     self.moves = self.moves[:-2*number]

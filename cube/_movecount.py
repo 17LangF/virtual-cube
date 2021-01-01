@@ -8,9 +8,13 @@ from cube.functions import split_move
 #Movecount
 def movecount(self, metric='OVERVIEW'):
     size = self.size
-    moves = self.moves
+    if isinstance(metric, list):
+        moves = metric
+        metric = 'OVERVIEW'
+    else:
+        moves = self.moves
 
-    metrics = ('HTM','QTM','STM','ETM','QSTM','ATM','OBTM','BTM')
+    metrics = ('HTM', 'QTM', 'STM', 'ETM', 'QSTM', 'ATM')
     move_counts = dict.fromkeys(metrics, 0)
 
     last_axis = 'X'
@@ -37,8 +41,6 @@ def movecount(self, metric='OVERVIEW'):
             move_counts['ETM'] += 1
             move_counts['QSTM'] += abs(turns)
             move_counts['ATM'] += axis != last_axis
-            move_counts['OBTM'] += 2
-            move_counts['BTM'] += 1
 
         #Outer turns
         else:
@@ -48,8 +50,6 @@ def movecount(self, metric='OVERVIEW'):
             move_counts['ETM'] += 1
             move_counts['QSTM'] += abs(turns)
             move_counts['ATM'] += axis != last_axis
-            move_counts['OBTM'] += 1
-            move_counts['BTM'] += 1
 
         if face in 'UD':
             last_axis = 'U'
@@ -62,7 +62,7 @@ def movecount(self, metric='OVERVIEW'):
         metrics = [metric.upper()]
 
     elif metric.upper() == 'OVERVIEW':
-        metrics = ('HTM','QTM','STM','ETM')
+        metrics = ('HTM', 'QTM', 'STM', 'ETM')
 
     elif metric.upper() == 'ALL':
         metrics = move_counts.keys()

@@ -10,28 +10,22 @@ def repeat(self, *moves):
     if not moves:
         raise TypeError
 
-    if type(moves[-1]) is int:
-        limit = moves[-1]
-        moves = moves[:-1]
-    elif type(moves[-1]) is str:
-        if moves[-1].isnumeric():
-            limit = int(moves[-1])
-            moves = moves[:-1]
-        else:
-            limit = 1000
-    else:
-        raise TypeError
+    limit = 1260
 
-    for move in moves:
-        if not split_move(move, self.size):
-            print(f'{move} is invalid.')
-            index = moves.index(move)
-            moves = moves[:index] + moves[index + 1:]
+    if len(moves) > 1:
+        if isinstance(moves[-1], int):
+            limit = moves[-1]
+            moves = moves[:-1]
+
+        elif isinstance(moves[-1], str):
+            if moves[-1].isnumeric():
+                limit = int(moves[-1])
+                moves = moves[:-1]
 
     for i in range(limit):
-        for move in moves:
-            self.move(move)
-        if issolved(self.cube):
-            break
+        self.move(moves)
 
-    return i + 1
+        if issolved(self.cube):
+            return i + 1
+
+    return False

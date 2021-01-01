@@ -1,33 +1,64 @@
 '''
 Virtual Cube Program - Made by Fred Lang.
-Speedsolve method.
+Play method.
 '''
 
 import time
 
 #Play
-def play(self, moves, tps='AUTO'):
+def play(self, *moves):
     size = self.size
+    play = False
+    move_time = 0
 
+    i = 0
     try:
-        tps = float(tps)
-    except ValueError:
-        if str(tps).upper() == 'AUTO':
-            if size < 4:
-                tps = 3
-            elif size < 8:
-                tps = 10
-            else:
-                tps = 0
-        else:
-            raise TypeError
+        while i < len(moves):
+            if not play:
+                choice = input().strip().upper()
 
-    if tps != 0:
-        move_time = 1 / tps
-    else:
-        move_time = 0
+                if not choice:
+                    print(moves[i])
 
-    for move in moves:
-        self.move(move)
+                elif choice == 'EXIT':
+                    self.move(moves[i:])
+                    self.show()
+                    break
+
+                elif choice.split()[0] == 'PLAY':
+                    if choice == 'PLAY':
+                        tps = size ** 2 / 2 + 1
+                    else:
+                        tps = choice.split(maxsplit=1)[1]
+                        if tps[0].lower() == 'x':
+                            if tps[1:].replace('.','',1).isdigit():
+                                tps = float(tps[1:]) * (size ** 2 / 2 + 1)
+                            else:
+                                print('Invalid tps.')
+                                continue
+
+                        elif tps.replace('.','',1).isdigit():
+                            tps = float(tps)
+
+                        else:
+                            print('Invalid tps.')
+                            continue
+
+                    play = True
+                    if tps > 0:
+                        move_time = 1 / tps
+                    else:
+                        move_time = 0
+
+                else:
+                    print('Invalid function.')
+                    continue
+
+            self.move(moves[i])
+            self.show()
+            i += 1
+            time.sleep(move_time)
+
+    except (EOFError, KeyboardInterrupt):
+        self.move(moves[i:])
         self.show()
-        time.sleep(move_time)

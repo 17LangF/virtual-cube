@@ -5,10 +5,14 @@ Scramble method.
 
 import random
 
+from cube.functions import split_move
+
 #Scramble
 def scramble(self, *scramble):
     size = self.size
     self.reset(size)
+
+    smoves = []
 
     if not scramble:
         scramble = ['MOVES']
@@ -30,7 +34,13 @@ def scramble(self, *scramble):
 
         invalid_moves = ['', []]
 
-        while len(self.smoves) < length:
+        while len(smoves) < length:
+            #0x0 scrambler
+            if size == 0:
+                smoves = [chr(random.randint(32,255)) for _ in range(length)]
+                print(f'SCRAMBLE: {" ".join(smoves)}')
+                return False
+
             #1x1 scrambler
             if size == 1:
                 smove = random.choice('xyz')
@@ -69,12 +79,11 @@ def scramble(self, *scramble):
                     smove = str(depth) + smove
 
             smove += random.choice(('','2',"'"))
-            self.move(smove)
-            self.smoves.append(smove)
-            self.moves.pop()
+            smoves.append(smove)
 
     #Random state scrambler
     elif scramble[0].upper() == 'STATE':
+        #1x1 scrambler
         if size == 1:
             scramble = [random.choice(('','z','x',"z'","x'",'x2'))]
             scramble.append(random.choice(('','y','y2',"y'")))
@@ -84,30 +93,27 @@ def scramble(self, *scramble):
 
             for smove in scramble:
                 if smove:
-                    self.move(smove)
-                    self.smoves.append(smove)
-                    self.moves.pop()
+                    smoves.append(smove)
 
+        #2x2 scrambler
         elif size == 2:
             if not hasattr(self, 'solutions'):
                 with open('docs/2x2 States and Solutions.txt') as f:
-                    self.solutions = f.readlines()[1:]
+                    self.solutions = [line.split(maxsplit=1)
+                                      for line in f.readlines()]
 
-            for smove in random.choice(self.solutions).split()[1:]:
-                self.move(smove)
-                self.smoves.append(smove)
-                self.moves.pop()
+            smoves = random.choice(self.solutions[1:])[1].split()
 
         else:
             print('Random state scrambler is not available for this size.')
+            return False
 
     #Input scramble
     else:
-        for smove in scramble:
-            if self.move(smove):
-                self.smoves.append(smove)
-                self.moves.pop()
-            else:
-                print(f'{smove} is invalid.')
+        smoves = scramble
 
-    return self.smoves
+    self.move(smoves)
+    self.moves = []
+    self.smoves = smoves
+
+    return smoves
