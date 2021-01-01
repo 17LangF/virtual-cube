@@ -3,13 +3,18 @@ Virtual Cube Program - Made by Fred Lang.
 Old Pochmann solver.
 '''
 
+from cube.functions import reverse
+
 #Old Pochmann
 def op(self):
     solve, stats = op_edges(self)
 
-    if len(stats['OP EDGES'].split()) % 2:
+    if len(stats['EDGE MEMO']) % 3 == 1:
         parity_alg = "R U' R' U' R U R D R' U' R D' R' U2 R' U'".split()
+
+        self.move(parity_alg)
         solve.extend(parity_alg)
+
         stats['PARITY'] = 'ODD'
     else:
         stats['PARITY'] = 'EVEN'
@@ -28,7 +33,7 @@ def op_corners(self):
     stats = {}
 
     if size > 2:
-        faces = tuple(cube[s][1][1] for s in range(6))
+        faces = [side[1][1] for side in cube]
     else:
         faces = 'ULFRBD'
 
@@ -68,10 +73,10 @@ def op_corners(self):
         corner = (cube[corner[0][0]][corner[0][1]][corner[0][2]],
                   cube[corner[1][0]][corner[1][1]][corner[1][2]],
                   cube[corner[2][0]][corner[2][1]][corner[2][2]])
-        corner = tuple(faces.index(x) for x in corner)
+        corner = tuple(faces.index(i) for i in corner)
 
         for possible_corner in corners:
-            if (tuple(corners[possible_corner][x][0] for x in range(3))
+            if (tuple(corners[possible_corner][i][0] for i in range(3))
                 == corner):
                 corner = possible_corner
                 break
@@ -103,22 +108,22 @@ def op_corners(self):
     corner = corners[corner]
     corner = (cube[corner[0][0]][corner[0][1]][corner[0][2]],
               cube[corner[1][0]][corner[1][1]][corner[1][2]])
-    corner = tuple(faces.index(x) for x in corner)
+    corner = tuple(faces.index(i) for i in corner)
 
     for possible_corner in corners:
-        if tuple(corners[possible_corner][x][0] for x in [0,1]) == corner:
+        if tuple(corners[possible_corner][i][0] for i in [0,1]) == corner:
             corner = possible_corner
             break
 
     if corner != 'A':
         corner_memo.append(corner)
 
-    num = 0
-    while num < len(corner_memo) - 1:
-        if corner_memo[num] == corner_memo[num+1]:
-            corner_memo = corner_memo[:num] + corner_memo[num+2:]
+    i = 0
+    while i < len(corner_memo) - 1:
+        if corner_memo[i] == corner_memo[i+1]:
+            corner_memo = corner_memo[:i] + corner_memo[i+2:]
         else:
-            num += 1
+            i += 1
 
     corner_alg = "R U' R' U' R U R' F' R U R' U' R' F R".split()
 
@@ -131,9 +136,19 @@ def op_corners(self):
 
         solve.extend(setup)
         solve.extend(corner_alg)
-        solve.extend(self.reverse(setup))
+        solve.extend(reverse(setup))
 
-    stats['OP CORNERS'] = ' '.join(corner_memo)
+    if size > 3:
+        solve = [f'{size-1}{move}' if 'w' in move else move for move in solve]
+
+    self.move(solve)
+
+    stats['OP CORNERS'] = len(solve)
+
+    corner_memo = iter(corner_memo)
+    corner_memo = [letter + next(corner_memo,'') for letter in corner_memo]
+
+    stats['CORNER MEMO'] = ' '.join(corner_memo)
 
     return solve, stats
 
@@ -144,10 +159,7 @@ def op_edges(self):
     solve = []
     stats = {}
 
-    if size > 2:
-        faces = tuple(cube[s][1][1] for s in range(6))
-    else:
-        faces = 'ULFRBD'
+    faces = [side[1][1] for side in cube]
 
     edges = {
         'A': ((0,0,1), (4,0,1), "Lw2 D' L2"),
@@ -184,10 +196,10 @@ def op_edges(self):
         edge = edges[edge]
         edge = (cube[edge[0][0]][edge[0][1]][edge[0][2]],
                 cube[edge[1][0]][edge[1][1]][edge[1][2]])
-        edge = tuple(faces.index(x) for x in edge)
+        edge = tuple(faces.index(i) for i in edge)
 
         for possible_edge in edges:
-            if tuple(edges[possible_edge][x][0] for x in [0,1]) == edge:
+            if tuple(edges[possible_edge][i][0] for i in [0,1]) == edge:
                 edge = possible_edge
                 break
 
@@ -218,22 +230,22 @@ def op_edges(self):
     edge = edges[edge]
     edge = (cube[edge[0][0]][edge[0][1]][edge[0][2]],
             cube[edge[1][0]][edge[1][1]][edge[1][2]])
-    edge = tuple(faces.index(x) for x in edge)
+    edge = tuple(faces.index(i) for i in edge)
 
     for possible_edge in edges:
-        if tuple(edges[possible_edge][x][0] for x in [0,1]) == edge:
+        if tuple(edges[possible_edge][i][0] for i in [0,1]) == edge:
             edge = possible_edge
             break
 
     if edge != 'B':
         edge_memo.append(edge)
 
-    num = 0
-    while num < len(edge_memo) - 1:
-        if edge_memo[num] == edge_memo[num+1]:
-            edge_memo = edge_memo[:num] + edge_memo[num+2:]
+    i = 0
+    while i < len(edge_memo) - 1:
+        if edge_memo[i] == edge_memo[i+1]:
+            edge_memo = edge_memo[:i] + edge_memo[i+2:]
         else:
-            num += 1
+            i += 1
 
     edge_alg = "R U R' U' R' F R2 U' R' U' R U R' F'".split()
 
@@ -246,8 +258,18 @@ def op_edges(self):
 
         solve.extend(setup)
         solve.extend(edge_alg)
-        solve.extend(self.reverse(setup))
+        solve.extend(reverse(setup))
 
-    stats['OP EDGES'] = ' '.join(edge_memo)
+    if size > 3:
+        solve = [f'{size-1}{move}' if 'w' in move else move for move in solve]
+
+    self.move(solve)
+
+    stats['OP EDGES'] = len(solve)
+
+    edge_memo = iter(edge_memo)
+    edge_memo = [letter + next(edge_memo,'') for letter in edge_memo]
+
+    stats['EDGE MEMO'] = ' '.join(edge_memo)
 
     return solve, stats

@@ -3,37 +3,37 @@ Virtual Cube Program - Made by Fred Lang.
 Beginners method solver.
 '''
 
-#Cross
-def cross(self):
+#Beginners cross
+def b_cross(self):
     cube = self.cube
     solve = []
-    edges = (1,0),(2,1),(1,2),(0,1)
+    edges = (1,0),(-1,1),(1,-1),(0,1)
 
     cross = {
-        'L': (4,1,2),
+        'L': (4,1,-1),
         "L'": (2,1,0),
-        'F': (1,1,2),
+        'F': (1,1,-1),
         "F'": (3,1,0),
-        'R': (2,1,2),
+        'R': (2,1,-1),
         "R'": (4,1,0),
-        'B': (3,1,2),
+        'B': (3,1,-1),
         "B'": (1,1,0),
         'L2': (5,1,0),
         'F2': (5,0,1),
-        'R2': (5,1,2),
-        'B2': (5,2,1),
+        'R2': (5,1,-1),
+        'B2': (5,-1,1),
         "L U' F": (1,0,1),
-        "L' U' F": (1,2,1),
+        "L' U' F": (1,-1,1),
         "F U' R": (2,0,1),
-        "F' U' R": (2,2,1),
+        "F' U' R": (2,-1,1),
         "R' U F'": (3,0,1),
-        "R U F'": (3,2,1),
+        "R U F'": (3,-1,1),
         "B' U R'": (4,0,1),
-        "B U R'": (4,2,1)
+        "B U R'": (4,-1,1)
     }
 
-    for s in range(6):
-        if cube[s][1][1] == 'U':
+    for s, side in enumerate(cube):
+        if side[1][1] == 'U':
             break
 
     if s != 5:
@@ -43,9 +43,9 @@ def cross(self):
 
     while not(all(cube[0][y][x] == 'U' for y,x in edges) or
               all(cube[5][y][x] == 'U' for y,x in edges) and
-              all(cube[s][2][1] == cube[s][1][1] for s in range(1,5))):
+              all(side[-1][1] == side[1][1] for side in cube[1:5])):
         for edge in cross:
-            if (cube[cross[edge][0]][cross[edge][1]][cross[edge][2]]
+            if (cube[cross[edge][0]][cross[edge][1]][cross[edge][-1]]
                 == 'U'):
                 break
 
@@ -59,18 +59,17 @@ def cross(self):
         else:
             moves = ['U2'] + edge.split()
 
-        for move in moves:
-            self.move(move)
+        self.move(moves)
         solve.extend(moves)
 
     while any(cube[5][y][x] != 'U' for y,x in edges):
         if cube[1][0][1] == cube[1][1][1] and cube[0][1][0] == 'U':
             self.move('L2')
             solve.append('L2')
-        if cube[2][0][1] == cube[2][1][1] and cube[0][2][1] == 'U':
+        if cube[2][0][1] == cube[2][1][1] and cube[0][-1][1] == 'U':
             self.move('F2')
             solve.append('F2')
-        if cube[3][0][1] == cube[3][1][1] and cube[0][1][2] == 'U':
+        if cube[3][0][1] == cube[3][1][1] and cube[0][1][-1] == 'U':
             self.move('R2')
             solve.append('R2')
         if cube[4][0][1] == cube[4][1][1] and cube[0][0][1] == 'U':
@@ -93,44 +92,44 @@ def cross(self):
             self.move('U2')
             solve.append('U2')
 
-    return solve, {'CROSS': ' '.join(solve)}
+    return solve, {'CROSS': len(solve)}
 
 #First layer
 def layer1(self):
     cube = self.cube
     solve = []
-    corners = (0,0),(0,2),(2,0),(2,2)
+    corners = (0,0),(0,-1),(-1,0),(-1,-1)
 
     first_layer = (
-        ((0,2,2),(2,0,2),(3,0,0)),
-        ((0,2,0),(1,0,2),(2,0,0)),
-        ((0,0,2),(3,0,2),(4,0,0)),
-        ((0,0,0),(4,0,2),(1,0,0))
+        ((0,-1,-1),(2,0,-1),(3,0,0)),
+        ((0,-1,0),(1,0,-1),(2,0,0)),
+        ((0,0,-1),(3,0,-1),(4,0,0)),
+        ((0,0,0),(4,0,-1),(1,0,0))
     )
 
     while not(all(cube[5][y][x] == 'U' for y,x in corners) and
-              all(len(set(cube[s][2])) == 1 for s in range(1,5))):
+              all(len(set(side[-1])) == 1 for side in cube[1:5])):
         for corner in first_layer:
             if any(cube[x[0]][x[1]][x[2]] == 'U' for x in corner):
                 break
         else:
-            if cube[5][0][2] != 'U' or cube[2][2][2] != cube[2][1][1]:
+            if cube[5][0][-1] != 'U' or cube[2][-1][-1] != cube[2][1][1]:
                 pass
             elif (cube[5][0][0] != 'U' or
-                  cube[1][2][2] != cube[1][1][1]):
+                  cube[1][-1][-1] != cube[1][1][1]):
                 self.move("y'")
                 solve.append("y'")
-            elif (cube[5][2][2] != 'U' or
-                  cube[3][2][2] != cube[3][1][1]):
+            elif (cube[5][-1][-1] != 'U' or
+                  cube[3][-1][-1] != cube[3][1][1]):
                 self.move('y')
                 solve.append('y')
             else:
                 self.move('y2')
                 solve.append('y2')
 
-            for move in 'R','U',"R'","U'":
-                self.move(move)
-                solve.append(move)
+            moves = 'R','U',"R'","U'"
+            self.move(moves)
+            solve.extend(moves)
             continue
 
         piece = []
@@ -138,8 +137,8 @@ def layer1(self):
             piece.append(cube[x[0]][x[1]][x[2]])
 
         slot = piece[piece.index('U')-1]
-        for s in range(1,5):
-            if cube[s][1][1] == slot:
+        for s, side in enumerate(cube[1:5], 1):
+            if side[1][1] == slot:
                 slot = s - 1
                 break
 
@@ -166,20 +165,20 @@ def layer1(self):
             self.move('y2')
             solve.append('y2')
 
-        while cube[5][0][2] != 'U' or cube[2][2][2] != cube[2][2][1]:
-            for move in 'R','U',"R'","U'":
-                self.move(move)
-                solve.append(move)
+        while cube[5][0][-1] != 'U' or cube[2][-1][-1] != cube[2][-1][1]:
+            moves = 'R','U',"R'","U'"
+            self.move(moves)
+            solve.extend(moves)
 
-    return solve, {'FIRST LAYER': ' '.join(solve)}
+    return solve, {'FIRST LAYER': len(solve)}
 
 #Second layer
 def layer2(self):
     cube = self.cube
     solve = []
     second_layer = (
-        ((0,2,1),(2,0,1)),
-        ((0,1,2),(3,0,1)),
+        ((0,-1,1),(2,0,1)),
+        ((0,1,-1),(3,0,1)),
         ((0,1,0),(1,0,1)),
         ((0,0,1),(4,0,1))
     )
@@ -187,19 +186,19 @@ def layer2(self):
     left_alg = "U' L' U L U F U' F'".split()
     right_alg = "U R U' R' U' F' U F".split()
 
-    while not all(cube[s][1][0] == cube[s][1][1] == cube[s][1][2]
-                  for s in range(1,6)):
+    while not all(side[1][0] == side[1][1] == side[1][-1]
+                  for side in cube[1:]):
         for edge in second_layer:
             if all(cube[x[0]][x[1]][x[2]] != 'D' for x in edge):
                 break
         else:
-            if (cube[2][1][2] != cube[2][1][1] or
+            if (cube[2][1][-1] != cube[2][1][1] or
                 cube[3][1][0] != cube[3][1][1]):
                 moves = right_alg
             elif (cube[2][1][0] != cube[2][1][1] or
-                  cube[1][1][2] != cube[1][1][1]):
+                  cube[1][1][-1] != cube[1][1][1]):
                 moves = left_alg
-            elif (cube[3][1][2] != cube[3][1][1] or
+            elif (cube[3][1][-1] != cube[3][1][1] or
                   cube[4][1][0] != cube[4][1][1]):
                 self.move('y')
                 solve.append('y')
@@ -209,17 +208,16 @@ def layer2(self):
                 solve.append("y'")
                 moves = left_alg
 
-            for move in moves:
-                self.move(move)
-                solve.append(move)
+            self.move(moves)
+            solve.extend(moves)
             continue
 
         piece = []
         for x in edge:
             piece.append(cube[x[0]][x[1]][x[2]])
 
-        for s in range(1,5):
-            if cube[s][1][1] == piece[1]:
+        for s, side in enumerate(cube[1:5], 1):
+            if side[1][1] == piece[1]:
                 side = s - 1
                 break
 
@@ -246,81 +244,92 @@ def layer2(self):
             self.move('y2')
             solve.append('y2')
 
-        if cube[0][2][1] == cube[1][1][1]:
+        if cube[0][-1][1] == cube[1][1][1]:
             moves = left_alg
         else:
             moves = right_alg
 
-        for move in moves:
-            self.move(move)
-            solve.append(move)
+        self.move(moves)
+        solve.extend(moves)
 
-    return solve, {'SECOND LAYER': ' '.join(solve)}
+    return solve, {'SECOND LAYER': len(solve)}
 
 #Last layer cross
 def eo(self):
     cube = self.cube
+    size = self.size
     solve = []
-    edges = (1,0),(2,1),(1,2),(0,1)
+    edges = (1,0),(-1,1),(1,-1),(0,1)
     eo_alg = "F R U R' U' F'".split()
 
     while any(cube[0][y][x] != 'D' for y,x in edges):
-        pieces = []
-        for edge in edges:
-            pieces.append(cube[0][edge[0]][edge[1]] == 'D')
+        pieces = tuple(i for i in range(4)
+                       if cube[0][edges[i][0]][edges[i][1]] == 'D')
+        setups = {
+            (0,1,2): 'U2',
+            (0,1,3): 'U',
+            (1,2,3): "U'",
+            (0,1): "U'",
+            (0,3): 'U2',
+            (1,3): 'U',
+            (2,3): 'U',
+            (1,): 'U'
+        }
 
-        if pieces[0] and pieces[1]:
-            self.move("U'")
-            solve.append("U'")
-        elif pieces[0] and pieces[3]:
-            self.move('U2')
-            solve.append('U2')
-        elif pieces[1] and pieces[3]:
-            self.move('U')
-            solve.append('U')
-        elif pieces[2] and pieces[3]:
-            self.move('U')
-            solve.append('U')
+        if pieces in setups:
+            self.move(setups[pieces])
+            solve.append(setups[pieces])
 
-        for move in eo_alg:
-            self.move(move)
-            solve.append(move)
+        #OLL parity
+        if len(pieces) % 2:
+            oll_parity = "Rw' U2 Lw F2 Lw' F2 Rw2 U2 Rw U2 Rw' U2 F2 Rw2 F2"
+            if size > 5:
+                rw = f'{size//2}Rw'
+                lw = f'{size//2}Lw'
+                oll_parity = oll_parity.replace('Rw',rw).replace('Lw',lw)
 
-    return solve, {'LAST LAYER CROSS': ' '.join(solve)}
+            oll_parity = oll_parity.split()
+            self.move(oll_parity)
+            solve.extend(oll_parity)
+        else:
+            self.move(eo_alg)
+            solve.extend(eo_alg)
+
+    return solve, {'LAST LAYER CROSS': len(solve)}
 
 #Last layer face
 def co(self):
     cube = self.cube
     solve = []
-    corners = (0,0),(0,2),(2,0),(2,2)
+    corners = (0,0),(0,-1),(-1,0),(-1,-1)
 
     if any(cube[0][y][x] != 'D' for y,x in corners):
         self.move('z2')
         solve.append('z2')
 
     while any(cube[5][y][x] != cube[5][1][1] for y,x in corners):
-        if cube[5][0][2] != 'D':
+        if cube[5][0][-1] != 'D':
             pass
         elif cube[5][0][0] != 'D':
             self.move('D')
             solve.append('D')
-        elif cube[5][2][2] != 'D':
+        elif cube[5][-1][-1] != 'D':
             self.move("D'")
             solve.append("D'")
         else:
             self.move('D2')
             solve.append('D2')
 
-        while cube[5][0][2] != 'D':
-            for move in 'R','U',"R'","U'":
-                self.move(move)
-                solve.append(move)
+        while cube[5][0][-1] != 'D':
+            moves = 'R','U',"R'","U'"
+            self.move(moves)
+            solve.extend(moves)
 
     if cube[0][1][1] == 'U':
         self.move('z2')
         solve.append('z2')
 
-    return solve, {'LAST LAYER FACE': ' '.join(solve)}
+    return solve, {'LAST LAYER FACE': len(solve)}
 
 #Last layer corners
 def cp(self):
@@ -328,18 +337,17 @@ def cp(self):
     solve = []
     cp_alg = "R U R' U' R' F R2 U' R' U' R U R' F'".split()
 
-    for s in range(1,5):
-        if cube[s][0][0] == cube[s][0][2]:
+    for s, side in enumerate(cube[1:5], 1):
+        if side[0][0] == side[0][-1]:
             break
     else:
-        for move in cp_alg:
-            self.move(move)
-            solve.append(move)
+        self.move(cp_alg)
+        solve.extend(cp_alg)
         s = 3
 
     piece = s - 1
-    for s in range(1,5):
-        if cube[s][1][1] == cube[piece + 1][0][0]:
+    for s, side in enumerate(cube[1:5], 1):
+        if side[1][1] == cube[piece + 1][0][0]:
             side = s - 1
             break
 
@@ -355,7 +363,7 @@ def cp(self):
         self.move("U'")
         solve.append("U'")
 
-    if any(cube[s][0][0] != cube[s][0][2] for s in (1,2)):
+    if any(cube[s][0][0] != cube[s][0][-1] for s in (1,2)):
         if side == 1:
             self.move('y')
             solve.append('y')
@@ -366,36 +374,49 @@ def cp(self):
             self.move("y'")
             solve.append("y'")
 
-        for move in cp_alg:
-            self.move(move)
-            solve.append(move)
+        self.move(cp_alg)
+        solve.extend(cp_alg)
 
-    return solve, {'LAST LAYER CORNERS': ' '.join(solve)}
+    return solve, {'LAST LAYER CORNERS': len(solve)}
 
 #Last layer edges
 def ep(self):
     cube = self.cube
+    size = self.size
     solve = []
-    ep_alg = "F2 U M' U2 M U F2".split()
+    ep_alg = "F2 U M' U2 M U F2"
 
-    if all(cube[s][0][0] != cube[s][0][1] for s in range(1,5)):
-        for move in ep_alg:
-            self.move(move)
-            solve.append(move)
+    if size > 3:
+        ep_alg = ep_alg.replace('M','m')
+    ep_alg = ep_alg.split()
 
-    while any(cube[s][0][0] != cube[s][0][1] for s in range(1,5)):
-        if cube[1][0][0] == cube[1][0][1]:
-            self.move('y')
-            solve.append('y')
-        elif cube[2][0][0] == cube[2][0][1]:
-            self.move('y2')
-            solve.append('y2')
-        elif cube[3][0][0] == cube[3][0][1]:
-            self.move("y'")
-            solve.append("y'")
+    while any(side[0][0] != side[0][1] for side in cube[1:5]):
+        pieces = tuple(s for s, side in enumerate(cube[1:5], 1)
+                       if side[0][0] == side[0][1])
+        setups = {
+            (2,4): 'y',
+            (1,): 'y',
+            (2,): 'y2',
+            (3,): "y'"
+        }
 
-        for move in ep_alg:
-            self.move(move)
-            solve.append(move)
+        if pieces in setups:
+            self.move(setups[pieces])
+            solve.append(setups[pieces])
 
-    return solve, {'LAST LAYER EDGES': ' '.join(solve)}
+        #PLL parity
+        if len(pieces) == 2:
+            pll_parity = "2R2 U2 2R2 Uw2 2R2 Uw2 U2"
+            if size > 5:
+                r = f'2-{size//2}Rw2'
+                uw = f'{size//2}Uw'
+                pll_parity = pll_parity.replace('2R2',r).replace('Uw',uw)
+
+            pll_parity = pll_parity.split()
+            self.move(pll_parity)
+            solve.extend(pll_parity)
+        else:
+            self.move(ep_alg)
+            solve.extend(ep_alg)
+
+    return solve, {'LAST LAYER EDGES': len(solve)}

@@ -3,16 +3,18 @@ Virtual Cube Program - Made by Fred Lang.
 Optimal solver.
 '''
 
+from cube.functions import reverse
+
 #2x2 Optimal
 def optimal(self):
     if not hasattr(self, 'solutions'):
         with open('docs/2x2 States and Solutions.txt') as f:
-            self.solutions = f.readlines()
+            self.solutions = [line.split(maxsplit=1) for line in f.readlines()]
 
     state = ''.join(''.join(s[0] + s[1][::-1]) for s in self.cube)
 
-    DLB = [state[23], state[7], state[18]]
-    change = {'U':'','L':DLB[1],'F':'','R':'','B':DLB[2],'D':DLB[0]}
+    dlb = [state[23], state[7], state[18]]
+    change = {'U':'','L':dlb[1],'F':'','R':'','B':dlb[2],'D':dlb[0]}
     faces = 'DLBURF'
     change['U'] = faces[faces.index(change['D']) - 3]
     change['R'] = faces[faces.index(change['L']) - 3]
@@ -21,11 +23,16 @@ def optimal(self):
     change = {v: k for k, v in change.items()}
     state = ''.join(change[char] for char in state)
 
-    for solution in self.solutions:
-        if solution.startswith(state):
-            solve = self.reverse(solution.split()[1:])
+    for possible_state, solution in self.solutions:
+        if possible_state == state:
+            if solution == '_\n':
+                solve = []
+            else:
+                solve = reverse(solution.split())
             break
     else:
         return False, {}
+
+    self.move(solve)
 
     return solve, {}
