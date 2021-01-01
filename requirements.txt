@@ -1,0 +1,9 @@
+Python 3.6+
+
+Required Python packages
+
+os
+math
+time
+timeit
+turtle
