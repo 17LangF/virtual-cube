@@ -1,0 +1,167 @@
+3210 R U R'
+4130 R U' R'
+2221 y' R' U R
+3141 y' R' U' R
+5230 L' R U' R' L
+3181 L F' U' F L'
+1081 F' L U' L' F
+8080 L R U2 R' L'
+4050 L' R U2 R' L
+2070 R' U R2 U' R'
+3270 R' U' R2 U R'
+6050 F L F2 L' F'
+7210 R' U2 R2 U' R'
+6070 R2 U' R2 U R2
+6080 L2 D F2 D' L2
+3151 R' u' R' u R
+6051 L u L' u' L'
+3080 R2 u R2 u' R2
+7121 y R L' U L R'
+3281 y R' F U F' R
+3150 y' R U R2 U' R
+5141 y' R U R2 U2 R
+6071 y R' u' R u R
+2250 L' U L R U R'
+5020 L' U L R U' R'
+2280 L U L' R U R'
+4180 L U' L' R U' R'
+8240 L U' L' R U2 R'
+6250 R U L' U2 R' L
+3251 F U2 F' R U R'
+6281 F' L U L' U2 F
+6181 F' U2 L U' L' F
+6081 F2 L F U' L' F
+7031 y R U' R' L' U L
+4170 y R U' R' L' U' L
+5241 L' U' L y' R' U' R
+8111 y' L' U L R' U2 R
+3171 R' U2 R y' R' U' R
+8021 L U' L' y' R' U2 R
+8030 y R' U R F U2 F'
+2230 R U R' U R U R'
+7130 R' U R U R U R'
+1020 R U R' U R U' R'
+6120 R U R' U' R U R'
+2210 R U' R' U R U R'
+6220 R U' R' U R U' R'
+8140 L U L' U R U R'
+5110 L' U L U' R U R'
+6150 R U' L' U' L U' R'
+6010 R' F R F' R U R'
+2061 R' F R F' R U' R'
+5051 L F' L' F R U' R'
+4261 F' U' F U' R U R'
+4260 R U R' U2 R U R'
+2140 R U R' U2 R U' R'
+2160 R U' R' U2 R U' R'
+4020 R U2 R' U R U' R'
+3020 R U2 R' U' R U R'
+7020 R' U2 R U' R U R'
+5070 R' L' U L R2 U' R'
+7050 R' L' U' L R2 U' R'
+5280 L U' L2 R U' R' L
+5281 L' U' L2 F' U' F L'
+3130 F' U F U2 R U R'
+2130 R U2 R' U2 R U' R'
+8051 L U2 L2 F' U' F L
+3230 R' U2 R2 U R2 U R
+7150 R' U2 R2 L' U2 L R'
+6131 y' R' U R U' R' U R
+4141 y' R' U R U' R' U' R
+6231 y' R' U' R U R' U' R
+1031 y' R' U' R U' R' U R
+4121 y' R' U' R U' R' U' R
+2161 R U R' U y' R' U' R
+6041 R U' R' U' y' R' U R
+3271 R' U R U' y' R' U R
+6270 y L' U R U R' U L
+8211 y' L' U' L U' R' U' R
+1051 y' R' F R F' R' U' R
+7071 y R' F R F' L' U L
+5031 y' R U2 R' U R' U' R
+4211 y' R' U' R U2 R' U R
+3031 y' R' U2 R U R' U' R
+2031 y' R' U2 R U' R' U R
+3221 R U' R' U2 y' R' U' R
+7221 R' U' R U2 y' R' U' R
+4221 y' R' U2 R U2 R' U R
+3121 y' R U2 R2 U' R2 U' R'
+7261 R' U F R F' R U' R'
+5060 D R U R' D' R U' R'
+7060 D' R U R' D R U' R'
+7181 R' U' R F' L U' L' F
+8150 L U L2 U L R U R'
+8270 L U L' R' U R2 U' R'
+8060 D2 R U R' D2 R U' R'
+7280 L U L' R' U2 R2 U' R'
+8170 L U2 L' R' U' R2 U R'
+5170 L' U2 L R' U R2 U' R'
+5161 F U' R' F' R y' R' U R
+6271 R' U' R2 U' R' y' R' U' R
+8071 L R' U' R L' y' R' U2 R
+3071 y R' F R F' U2 L' U' L
+5171 R' U2 R y' R U R2 U2 R
+5071 D2 R' U' R D2 y' R' U2 R
+6171 R' U R2 U2 R' y' R' U2 R
+7180 R' U R L U L' R U R'
+7160 R' U R D U' R' U R D'
+7281 R' U R U' F' L U' L' F
+7260 R' U' R U D R' U' R D'
+5061 F' U' F L' U L R U' R'
+8161 L F' U' F L' U R U' R'
+5160 L' U L D' U' L' U L D
+5260 L' U' L U D' L' U' L D
+5180 L U L2 U L U' R U R'
+7170 R' U R2 U R' U R U R'
+5080 D' L U' L' D U2 R U R'
+7080 L R' U R L' U2 R U' R'
+5181 L' U' L U2 F' L U' L' F
+8160 L U L' U' D2 L U L' D2
+8260 L U' L' D2 U L U' L' D2
+8050 L U' L2 U' L U2 R U R'
+8151 L U2 L' F U2 F' R U R'
+8250 L U2 L' U L' R U2 R' L
+5270 L' U L U2 R' U R2 U' R'
+6170 R U R2 U' R U2 R U' R'
+7250 R' U R U2 L' R U2 R' L
+7070 R' U R2 U2 R' U2 R U' R'
+8061 L R U R' L' U' y' R' U R
+7081 L U' L' y' L U' L' R' U R
+6251 L' U L R U' R' y' R' U' R
+8171 R' U' R L U L' y' R' U R
+8261 y R' F U F' R U' L' U L
+5261 R U2 R' L' U' L y' R' U' R
+7061 R' U R2 U R' U y' R' U' R
+7051 R' U' R L' U L y' R' U2 R
+5271 R' U2 R L' U' L y' R' U' R
+5081 L' U L2 U L' U' y' R' U' R
+7151 L' U2 L R' U R y' R' U R
+6151 R U2 R' L' U L y' R' U2 R
+8070 y R' U R2 U R' U2 L' U' L
+8251 L U' L2 U2 L U2 y' R' U' R
+8180 L U L' R U' R' U R U R'
+5250 L' U L U R U R' U R U' R'
+6180 L U2 L' R U R' U' R U R'
+6280 L U2 L' R U' R' U R U' R'
+8280 L U2 L' R U2 R' U' R U R'
+8281 L U' L' y' R' U R U R' U' R
+8181 L U' L' y' R' U' R U' R' U R
+7271 R' U R y' R' U2 R U' R' U R
+8271 R' U R L U' L' U2 y' R' U' R
+8081 L U' L' y' U L' U2 L R' U R
+5151 L' U L y' R' U' R U R' U2 R
+7161 R' U2 R F R' F' R y' R' U R
+7251 L' U2 L R' U' R U2 y' R' U' R
+4060 R U' R' U R U' R' U R U' R'
+4040 R U' R' U' R U' R' U R U' R'
+7270 R' U R U' R U R' U R U' R'
+5150 L' U L U R U' R' U' R U R'
+6160 R U R' U2 R U' R' U R U R'
+6260 R U' R' U' R U R' U2 R U' R'
+5050 L' U L U2 R U2 R' U' R U2 R'
+2011 y' R' U R U R' U R U' R' U R
+6261 R U' R' U' R U' R' U y' R' U' R
+7171 R' U R U R' U' R U' y' R' U R
+6161 R U R' U' R U' R' U2 y' R' U' R
+6061 R U' R' U y' R' U2 R U R' U2 R
+5251 L' U L y' U2 R' U2 R U' R' U R
