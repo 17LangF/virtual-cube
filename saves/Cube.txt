@@ -1,0 +1,6 @@
+UUUUUUUUULLLLLLLLLFFFFFFFFFRRRRRRRRRBBBBBBBBBDDDDDDDDD
+3
+
+
+{'SHOW': True, 'DIMENSION': 3, '3D': [38, 28, 0.1, 180, 9], '2D': ['██', 'fg,colour', True]}
+{'U': (255, 255, 255), 'L': (255, 165, 0), 'F': (0, 128, 0), 'R': (255, 0, 0), 'B': (0, 0, 255), 'D': (255, 255, 0)}
