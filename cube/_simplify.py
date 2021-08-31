@@ -1,30 +1,61 @@
-'''
-Virtual Cube Program - Made by Fred Lang.
-Simplify method.
-'''
+"""Simplify moves."""
 
 from cube.functions import orient, split_move, reverse
 
-#Simplify
-def simplify(self, *move_types):
+
+def simplify(self, *move_types: str) -> list:
+    """
+    Simplify moves.
+
+    Parameters
+    ----------
+    *move_types : {'ALL', 'TURNS', 'ADJACENT', 'PARALLEL', 'WIDE',
+    'SLICE', 'ROTATION'}
+        Move types to simplify.
+
+        TURNS: reduce the number of 90 degree turns.
+            e.g., U3 becomes U', U4 U5 U6' U7' becomes U U2 U.
+        'ADJACENT': cancel adjacent moves where possible.
+            e.g., U U becomes U2, Uw Uw2 becomes Uw'.
+        'PARALLEL': cancel moves which are parallel.
+            e.g., L R L becomes L2 R, L Lw L becomes L2 Lw.
+        'WIDE': remove wide moves and reduce the depth of turns where
+        possible.
+            e.g., on 3x3, Rw becomes L x. On 5x5, 3Rw becomes Lw x.
+        'SLICE': remove slice moves.
+            e.g., on 3x3, M becomes L' Lw. On 5x5, 2-3Rw becomes R' 3Rw.
+        'ROTATION': move all rotations to the end and simplify them.
+            e.g., x U becomes F x, x2 y2 becomes z2.
+        'ALL': combine all the above. (Default value if no `move_types`
+        given)
+
+        Moves are simplified in the order of SLICE, WIDE, ROTATION,
+        PARALLEL, ADJACENT, TURNS.
+
+    Returns
+    -------
+    list
+        Simplified moves.
+    """
+
+    from cube import Cube
+
     moves = self.moves
     size = self.size
-
-    all_move_types = ['CANCEL', 'PARALLEL', 'WIDE', 'SLICE', 'ROTATION']
+    all_move_types = {'TURNS', 'ADJACENT', 'PARALLEL', 'WIDE', 'SLICE',
+                      'ROTATION'}
     move_types = ' '.join(move_types).upper().split()
 
     if not move_types:
         move_types = ['ALL']
-
     if move_types == ['ALL']:
         move_types = all_move_types
 
     if not set(move_types).issubset(all_move_types):
-        raise TypeError
+        raise ValueError
 
     suffixes = "0123456789'"
 
-    #Slice
     if 'SLICE' in move_types:
         i = 0
         while i < len(moves):
@@ -35,7 +66,7 @@ def simplify(self, *move_types):
                 if depth[0] > 1:
                     moves[i] += 'w'
                 if depth[0] > 2:
-                    moves[i] = str(depth[0]) + moves[i]
+                    moves[i] = f'{depth[0]}{moves[i]}'
 
                 if turns % 4 == 1:
                     moves[i] += "'"
@@ -47,7 +78,7 @@ def simplify(self, *move_types):
                 if depth[1] > 1:
                     moves[i+1] += 'w'
                 if depth[1] > 2:
-                    moves[i+1] = str(depth[1]) + moves[i+1]
+                    moves[i+1] = f'{depth[1]}{moves[i+1]}'
 
                 if turns % 4 == 2:
                     moves[i+1] += '2'
@@ -58,15 +89,39 @@ def simplify(self, *move_types):
 
             i += 1
 
-    #Wide
     if 'WIDE' in move_types:
         i = 0
         while i < len(moves):
             depth, face, turns = split_move(moves[i], size)
 
-            if depth[0] == 0 and size / 2 <= depth[1] < size:
-                if depth[1] > size / 2 or face in 'LBD':
-                    if face in 'UFR':
+            if depth[0] == depth[1]:
+                moves.pop(i)
+                continue
+
+            if depth[0] > 0 and depth[1] == size:
+                depth = [0, size - depth[0]]
+                face = 'ULFDRB'['ULFDRB'.index(face)-3]
+                moves[i] = f'{depth[1]}{face}w'
+                turns = -turns % 4
+
+                if turns == 2:
+                    moves[i] += '2'
+                elif turns == 3:
+                    moves[i] += "'"
+
+            if not depth[0] and depth[1] < size:
+                if moves[i][1:2] == '-':
+                    moves[i] = moves[i][2:]
+                if depth[1] == 1:
+                    if moves[i][0] == '1':
+                        moves[i] = moves[i][1:].replace('w', '').upper()
+                elif depth[1] == 2:
+                    if moves[i][0] == '2':
+                        moves[i] == moves[i][1:]
+
+            if not depth[0] and size / 2 <= depth[1] < size:
+                if depth[1] > size / 2 or face in {'L', 'B', 'D'}:
+                    if face in {'U', 'F', 'R'}:
                         if face == 'U':
                             face = 'D'
                             rotation = 'y'
@@ -103,10 +158,8 @@ def simplify(self, *move_types):
 
                     if depth[1] > 1:
                         moves[i] += 'w'
-
                     if depth[1] > 2:
-                        moves[i] = str(depth) + moves[i]
-
+                        moves[i] = f'{depth[1]}{moves[i]}'
                     if turns % 4 == 2:
                         moves[i] += '2'
                     elif turns % 4 == 3:
@@ -117,16 +170,14 @@ def simplify(self, *move_types):
 
             i += 1
 
-    #Rotation
     if 'ROTATION' in move_types:
         rotations = []
         i = len(moves) - 1
         while i >= 0:
             depth, face, turns = split_move(moves[i], size)
-            if depth[0] == 0 and depth[1] >= size:
+            if not depth[0] and depth[1] >= size:
                 for _ in range(turns % 4):
                     last = ' '.join(moves[i+1:])
-
                     replacements = {
                         'U': ('LBRF.', 'SM'),
                         'L': ('UFDB.', 'SE'),
@@ -135,7 +186,6 @@ def simplify(self, *move_types):
                         'B': ('ULDR.', 'ME'),
                         'D': ('LFRB.', 'MS')
                     }
-
                     faces, slices = replacements[face]
 
                     for lower in False, True:
@@ -158,15 +208,16 @@ def simplify(self, *move_types):
 
             i -= 1
 
-        moves.extend(reverse(orient(self.cube)))
+        cube = Cube(1)
+        cube.move(rotations)
+        moves.extend(reverse(orient(cube.cube)))
 
-    #Parallel
     if 'PARALLEL' in move_types:
         i = 1
         while i < len(moves):
             depth, face, turns = split_move(moves[i], size)
 
-            if face in 'LBD':
+            if face in {'L', 'B', 'D'}:
                 depth = [size - depth[1], size - depth[0]]
 
                 if face == 'L':
@@ -178,7 +229,7 @@ def simplify(self, *move_types):
 
             for j in range(i-1, -1, -1):
                 last_depth, last_face, last_turns = split_move(moves[j], size)
-                if last_face in 'LBD':
+                if last_face in {'L', 'B', 'D'}:
                     last_depth = [size - last_depth[1], size - last_depth[0]]
 
                     if last_face == 'L':
@@ -198,17 +249,15 @@ def simplify(self, *move_types):
                 moves[j] = moves[j].rstrip(suffixes)
                 turn = (last_turns + turns) % 4
 
-                if turn == 1:
-                    moves[j] += ''
-                elif turn == 2:
-                    moves[j] += '2'
-                elif turn == 3:
-                    moves[j] += "'"
-                else:
+                if not turn:
                     moves.pop(i)
                     moves.pop(j)
                     i = j
                     break
+                elif turn == 2:
+                    moves[j] += '2'
+                elif turn == 3:
+                    moves[j] += "'"
 
                 moves.pop(i)
                 i = j + 1
@@ -216,8 +265,7 @@ def simplify(self, *move_types):
             else:
                 i += 1
 
-    #Cancel
-    if 'CANCEL' in move_types:
+    if 'ADJACENT' in move_types:
         i = 1
         while i < len(moves):
             depth, face, turns = split_move(moves[i], size)
@@ -227,21 +275,35 @@ def simplify(self, *move_types):
                 moves[i-1] = moves[i-1].rstrip(suffixes)
                 turns = (turns + last_turns) % 4
 
-                if turns == 1:
-                    moves[i-1] += ''
+                if not turns:
+                    moves.pop(i)
+                    moves.pop(i-1)
+                    i -= 1
+                    continue
                 elif turns == 2:
                     moves[i-1] += '2'
                 elif turns == 3:
                     moves[i-1] += "'"
-                else:
-                    moves.pop(i)
-                    moves.pop(i-1)
-                    if i > 1:
-                        i -= 1
-                    continue
 
                 moves.pop(i)
                 continue
+
+            i += 1
+
+    if 'TURNS' in move_types:
+        i = 0
+        while i < len(moves):
+            depth, face, turns = split_move(moves[i], size)
+            moves[i] = moves[i].rstrip(suffixes)
+            turns %= 4
+
+            if not turns:
+                moves.pop(i)
+                continue
+            if turns == 2:
+                moves[i] += '2'
+            elif turns == 3:
+                moves[i] += "'"
 
             i += 1
 

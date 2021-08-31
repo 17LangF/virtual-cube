@@ -1,17 +1,13 @@
-'''
-Virtual Cube Program - Made by Fred Lang.
-Invert method.
-'''
+"""Switch to the inverse scramble and reverse moves."""
 
 from cube.functions import reverse
 
-#Invert
+
 def invert(self):
-    size = self.size
+    """Switch to the inverse scramble and reverse moves."""
     smoves = self.smoves
     moves = self.moves
     self.reset(self.size)
-
     self.smoves = reverse(moves)
     self.move(self.smoves)
     self.moves = []

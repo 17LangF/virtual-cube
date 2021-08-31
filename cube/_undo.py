@@ -1,32 +1,35 @@
-'''
-Virtual Cube Program - Made by Fred Lang.
-Undo method.
-'''
+"""Reverse last move or last number of moves."""
 
 from cube.functions import reverse
 
-#Undo
+
 def undo(self, number=1):
+    """
+    Reverse last move or last number of moves.
+
+    Parameters
+    ----------
+    number : str or int, default=1
+        Number of moves to undo.
+
+        If `number` == 'ALL', then all moves are reversed.
+
+        Else, `number` must be an integer or numeric string.
+    """
     if isinstance(number, str):
-        #Undo all
+        # Undo all
         if number.upper() == 'ALL':
             smoves = self.smoves
             self.reset(self.size)
-
             self.smoves = smoves
             self.move(smoves)
             self.moves = []
             return
-
-        #Undo a number of moves
-        elif number.isnumeric():
+        # Undo a number of moves
+        elif number.isdecimal():
             number = int(number)
-
         else:
-            raise TypeError
-
-    elif not isinstance(number, int):
-        raise TypeError
+            raise ValueError
 
     self.move(reverse(self.moves[-number:]))
     self.moves = self.moves[:-2*number]

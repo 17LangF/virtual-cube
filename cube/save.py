@@ -1,19 +1,29 @@
-'''
-Virtual Cube Program - Made by Fred Lang.
-Save and load functions.
-'''
+"""Save and load cube attributes to and from a file."""
+
+import ast
 
 from cube import Cube
 
-#Load
-def load(filename):
+
+def load(filename: str) -> Cube:
+    """
+    Load a cube from a previously saved file.
+
+    Parameters
+    ----------
+    filename : str
+        Name of previously saved file.
+
+    Returns
+    -------
+    Cube
+        Cube loaded from file.
+    """
     with open(filename, encoding='utf-8') as file:
         data = file.read().splitlines()
 
-    state, size, moves, smoves, showstyle, colours = data
-
+    state, size, moves, smoves, show_style, colours = data
     cube = Cube()
-
     size = int(size)
     state = list(state)
     state = [state[y:y + size] for y in range(0, len(state), size)]
@@ -23,21 +33,28 @@ def load(filename):
     cube.size = size
     cube.moves = moves.split()
     cube.smoves = smoves.split()
-    cube.showstyle = eval(showstyle)
-    cube.colours = eval(colours)
-
+    cube.show_style = ast.literal_eval(show_style)
+    cube.colours = ast.literal_eval(colours)
     return cube
 
-#Save
-def save(cube, filename):
-    attributes = [
+
+def save(cube, filename: str):
+    """
+    Save cube attributes to a file.
+
+    Parameters
+    ----------
+    filename : str
+        Name of file to save to.
+    """
+    attributes = (
         ''.join(x for s in cube.cube for y in s for x in y),
         str(cube.size),
         ' '.join(cube.moves),
         ' '.join(cube.smoves),
-        str(cube.showstyle),
+        str(cube.show_style),
         str(cube.colours)
-    ]
+    )
 
     with open(filename, 'w', encoding='utf-8') as file:
         file.write('\n'.join(attributes))

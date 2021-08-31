@@ -1,12 +1,33 @@
-'''
-Virtual Cube Program - Made by Fred Lang.
-Play method.
-'''
+"""Create a command line interface to play moves one at a time."""
 
 import time
 
-#Play
-def play(self, *moves):
+
+def play(self, *moves: str):
+    """
+    Create a command line interface to play moves one at a time.
+
+    Enter key - step through the moves one at a time.
+
+    EXIT or Ctrl+C - skip to the end of the moves.
+
+    PLAY tps - animate the moves (should only be used in 3D SHOW mode).
+        Default tps = size ^ 2 / 2 + 1.
+
+        If tps is 0, the moves are played at maximum speed.
+
+        If tps is xN, the moves are played N times the default speed.
+
+    Parameters
+    ----------
+    *moves : str
+        Sequence of moves to be excecuted in order.
+
+    Raises
+    ------
+    MoveError
+        If any of the moves are invalid.
+    """
     size = self.size
     play = False
     move_time = 0
@@ -31,17 +52,17 @@ def play(self, *moves):
                     else:
                         tps = choice.split(maxsplit=1)[1]
                         if tps[0].lower() == 'x':
-                            if tps[1:].replace('.','',1).isdigit():
+                            if tps[1:].replace('.', '', 1).isdecimal():
                                 tps = float(tps[1:]) * (size ** 2 / 2 + 1)
                             else:
-                                print('Invalid tps.')
+                                print("Invalid tps.")
                                 continue
 
-                        elif tps.replace('.','',1).isdigit():
+                        elif tps.replace('.', '', 1).isdecimal():
                             tps = float(tps)
 
                         else:
-                            print('Invalid tps.')
+                            print("Invalid tps.")
                             continue
 
                     play = True
@@ -51,7 +72,7 @@ def play(self, *moves):
                         move_time = 0
 
                 else:
-                    print('Invalid function.')
+                    print("Invalid function.")
                     continue
 
             self.move(moves[i])
