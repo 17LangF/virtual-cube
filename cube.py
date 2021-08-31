@@ -1,53 +1,88 @@
-'''
+"""
 Virtual Cube Program - Made by Fred Lang.
-Main program.
-'''
 
-print('Importing...')
+Allow the user to input functions with arguments and make moves to
+control a Rubik's Cube.
+"""
 
-#Imports
 try:
     import os
+    import statistics
 
-    from cube import Cube
+    from cube import Cube, CubeError, MoveError
     from cube.functions import convert_seconds, parse_moves
-    from cube.help import help
+    from cube.manual import manual
     from cube.save import load, save
 
 except ModuleNotFoundError as e:
-    print(str(e).split()[-1] + ' could not be imported.')
-    exit()
+    print(str(e).split()[-1] + " could not be imported.")
+    raise SystemExit
 
 except AttributeError as e:
     print("'" + str(e).split("'")[-2] + ".py' was not found.")
-    exit()
+    raise SystemExit
 
-#Freeplay
+
 def freeplay():
-    screen_size = 79
+    """
+    Create a command line interface to control a Rubik's Cube.
+
+    Cube functions:
+        COLOUR: Change the colour of a side of the cube.
+        EXIT: Exit program.
+        HELP: Return help page for a given function.
+        INPUT: Set the state of the cube.
+        INVERT: Switch to the inverse scramble and reverse moves.
+        LINK: Return an alg.cubing.net link for the cube.
+        LOAD: Load a cube from a previously saved file.
+        MIRROR: Mirror all moves across a plane.
+        MOVECOUNT: Return current move count.
+        PLAY: Play through moves one at a time.
+        REPEAT: Repeat moves until solved.
+        RESET: Reset cube and set cube size.
+        SAVE: Save cube attributes to a file.
+        SCRAMBLE: Reset and scramble cube.
+        SHOW: Show cube.
+        SIMPLIFY: Simplify moves.
+        SOLVE: Compute a solution to solve the cube.
+        SPEEDSOLVE: Solve the cube as fast as you can.
+        UNDO: Reverse last move or last number of moves.
+
+    Help sheets:
+        NOTATION: Explain cube notation.
+        METRICS: Explain different turn metrics.
+
+    Cube attributes:
+        CUBE: Return the cube state as a string.
+        SIZE: Return cube size.
+        MOVES: Return moves.
+        SMOVES: Return scramble/setup moves.
+        SHOWSTYLE: Return current style to show the cube.
+        COLOURS: Return colour scheme of the cube in RGB.
+    """
     os.system('cls')
 
-    print('''
-Virtual Cube Program - Made by Fred Lang.
-Enter HELP for list of functions.\
-''')
+    print("Virtual Cube Program - Made by Fred Lang.\n"
+          "Enter HELP for list of functions.")
 
     cube = Cube()
-    functions = [i for i in dir(cube) if callable(getattr(cube, i))
-                 and not i.startswith('_') and i not in ('MoveError', 'move')]
-
-    print()
+    functions = [i for i in dir(cube) if callable(getattr(cube, i)) and not
+                 i.startswith('_') and i != 'move' and i.islower()]
     cube.show()
-    print()
 
     while True:
-        print('='*screen_size)
-        print()
-        moves = input('Enter move(s) or function: ').strip()
-        print()
+        try:
+            screen_size = os.get_terminal_size().columns
+        except (OSError, ValueError):
+            screen_size = 80
+
+        print('\n' + '=' * screen_size)
+        moves = input("\nEnter move(s) or function: ").strip()
 
         if not moves:
             continue
+
+        print()
 
         function = moves.split()[0].upper()
         if len(moves.split()) > 1:
@@ -55,21 +90,21 @@ Enter HELP for list of functions.\
         else:
             args = ''
 
-        #Exit
+        # Exit
         if function == 'EXIT':
             raise SystemExit
 
-        #Help
+        # Help
         elif function == 'HELP':
             try:
                 if args:
-                    help(args.upper())
+                    manual(args.upper())
                 else:
-                    help()
+                    manual()
             except FileNotFoundError as e:
-                print(str(e).split(': ')[1], 'was not found.')
+                print(str(e).split(': ')[1], "was not found.")
 
-        #Load
+        # Load
         elif function == 'LOAD':
             if args:
                 filename = f'saves/{args}.txt'
@@ -79,81 +114,78 @@ Enter HELP for list of functions.\
             try:
                 cube = load(filename)
             except FileNotFoundError as e:
-                print(str(e).split(': ')[1], 'was not found.\n')
-                continue
-            except:
-                print('Failed to load.\n')
+                print(str(e).split(': ')[1], "was not found.")
                 continue
 
-            print(f"Successfully loaded '{filename}'.\n")
+            print(f"Successfully loaded '{filename}'.")
 
             for name, moves in ('SCRAMBLE',cube.smoves), ('MOVES',cube.moves):
                 if moves:
-                    print(f'{name}: {" ".join(moves)}\n')
+                    print(f"{name}: {' '.join(moves)}\n")
                 else:
-                    print(f'{name}: No moves\n')
+                    print(f"{name}: No moves\n")
 
             cube.show()
 
-        #Save
+        # Save
         elif function == 'SAVE':
             if args:
                 filename = f'saves/{args}.txt'
             else:
-                filename = 'saves/Cube.txt'
+                i = 1
+                while os.path.exists(f'saves/Cube {i}.txt'):
+                    i += 1
+
+                filename = f'saves/Cube {i}.txt'
 
             try:
                 save(cube, filename)
             except FileNotFoundError:
-                print('Could not create file.\n')
-                continue
+                print("Could not create file.")
+            else:
+                print(f"Successfully saved as '{filename}'.")
 
-            print(f"Successfully saved in '{filename}'.")
-
-        #Functions
+        # Functions
         elif function.lower() in functions:
-            if (function in ('PLAY', 'REPEAT') or function == 'SCRAMBLE' and
-                args[:5].upper() not in ('MOVES', 'STATE')):
+            if (function in {'PLAY', 'REPEAT'} or function == 'SCRAMBLE' and
+                args[:5].upper() not in {'MOVES', 'STATE', 'SEED '}):
                 try:
                     args = parse_moves(args)
-                except Cube.MoveError as e:
-                    print(f'{e}\n')
+                except MoveError as e:
+                    print(e)
                     continue
             else:
                 args = args.split()
 
             try:
                 result = getattr(cube, function.lower())(*args)
-            except Cube.MoveError as e:
-                print(f'{e}\n')
+            except (CubeError, MoveError) as e:
+                print(e)
                 continue
-            except TypeError:
-                print('Incorrect arguments given.\n')
+            except (TypeError, ValueError):
+                print("Invalid arguments given.")
                 continue
             except FileNotFoundError as e:
-                print(str(e).split(': ')[1], 'was not found.\n')
+                print(str(e).split(': ')[1], "was not found.")
                 continue
 
-            if function in ('COLOUR', 'INPUT', 'INVERT', 'MIRROR', 'UNDO'):
+            if function in {'COLOUR', 'INPUT', 'INVERT', 'MIRROR', 'UNDO'}:
                 cube.show()
 
             elif function == 'LINK':
-                if result:
-                    print(result)
-                else:
-                    print('Size is not supported by alg.cubing.net.')
+                print(result)
 
             elif function == 'MOVECOUNT':
                 for metric in result:
-                    print(f'{metric}: {result[metric]}')
+                    print(f"{metric}: {result[metric]}")
 
             elif function == 'REPEAT':
                 if not result:
-                    print(f'Did not solve.\n')
+                    print(f"Did not solve.\n")
                 elif result == 1:
-                    print(f'1 repetition.\n')
+                    print(f"Solved after 1 repetition.\n")
                 else:
-                    print(f'{result} repetitions.\n')
+                    print(f"Solved after {result} repetitions.\n")
                 cube.show()
 
             elif function == 'RESET':
@@ -162,89 +194,113 @@ Enter HELP for list of functions.\
                 cube.show()
 
             elif function == 'SCRAMBLE':
-                if result:
-                    print(f'SCRAMBLE: {" ".join(result)}')
-                    cube.reset(cube.size)
-                    print()
-                    cube.show()
-                    cube.play(*result)
-                    cube.smoves = result
-                    cube.moves = []
-                elif result == []:
-                    print('SCRAMBLE: No moves')
+                if isinstance(result, list):
+                    if result:
+                        print(f"SCRAMBLE: {' '.join(result)}")
+                        cube.reset(cube.size)
+                        if cube.size:
+                            print()
+                            cube.show()
+                            cube.play(*result)
+                            cube.smoves = result
+                            cube.moves = []
+                    else:
+                        print("SCRAMBLE: No moves")
+                else:
+                    print(f"SEED: {repr(result)}")
 
             elif function == 'SIMPLIFY':
                 if result:
                     print(' '.join(result))
                 else:
-                    print('No moves.')
+                    print("No moves.")
 
             elif function == 'SOLVE':
-                solve, stats, solve_time = result
-                if solve == False:
-                    print('Could not solve.')
-
-                elif isinstance(solve, int):
+                solve, stats = result
+                if isinstance(solve, int):
                     cube.show()
-                    print(f'SOLVED: {solve}\n')
+                    print(f"SOLVED: {solve}\n")
 
-                    table = [['', *stats['AVERAGE'].keys()]]
-                    for stat in stats:
-                        table.append([stat, *stats[stat].values()])
+                    stats, solve_time = stats
+                    table = [[], ['', 'AVERAGE', 'BEST', 'WORST']]
 
-                    def length(var):
-                        if isinstance(var, int):
-                            return len(str(var))
-                        elif isinstance(var, float):
-                            return len(f'{var:.6f}')
+                    for substep in stats[0]:
+                        if not isinstance(stats[0][substep], (int, float)):
+                            continue
+
+                        data = [movecount[substep] for movecount in stats]
+
+                        if len(data) > 1:
+                            mean = statistics.mean(data)
+                            stdev = statistics.stdev(data)
                         else:
-                            return len(var)
+                            mean = data[0]
+                            stdev = 0
 
-                    columns = [max(map(length, column)) for column in table]
-                    table = [list(row) for row in zip(*table)]
+                        if substep == 'HTM':
+                            table.append([])
 
-                    for row in table:
-                        for x, value in enumerate(row):
-                            if isinstance(value, int):
-                                row[x] = f'{row[x]:{columns[x]}}'
-                            elif isinstance(value, float):
-                                row[x] = f'{row[x]:{columns[x]}.6f}'
-                            else:
-                                row[x] = f'{row[x]:^{columns[x]}}'
+                        if substep == 'TIME':
+                            table.append([])
+                            average = f'{mean:.6f} (\u03c3={stdev:.2f})'
+                            best = f'{min(data):.6f}'
+                            worst = f'{max(data):.6f}'
+
+                        else:
+                            average = f'{mean:.3f} (\u03c3={stdev:.2f})'
+                            best = f'{min(data)}'
+                            worst = f'{max(data)}'
+
+                        table.append([substep, average, best, worst])
+
+                    table.append([])
+
+                    if table[2]:
+                        table.insert(2, [])
+
+                    columns = zip(*[row for row in table if row])
+                    columns = [len(max(column, key=len)) for column in columns]
 
                     line = ['', *('-' * column for column in columns), '']
                     line = '+'.join(line)
 
-                    for row in table:
-                        if (row[0].strip() in ('', 'TIME') or
-                            len(table) > 7 and row[0].strip() == 'HTM'):
-                            print(line)
-                        print('|'.join(('', *row, '')))
-                        if row[0].strip() in ('', 'TIME'):
-                            print(line)
+                    for y, row in enumerate(table):
+                        if row:
+                            for x, (i, length) in enumerate(zip(row, columns)):
+                                if i and i[0].isalpha():
+                                    table[y][x] = f'{i:^{length}}'
+                                else:
+                                    table[y][x] = f'{i:>{length}}'
 
-                    print(f'\nTOTAL TIME: {convert_seconds(solve_time)}')
+                            table[y] = '|'.join(['', *table[y], ''])
+                        else:
+                            table[y] = line
+
+                    table = '\n'.join(table)
+
+                    print(table)
+                    print(f"\nTOTAL TIME: {convert_seconds(solve_time)}")
 
                 else:
                     if solve:
-                        print(f'SOLUTION: {" ".join(solve)}')
+                        print(f"SOLUTION: {' '.join(solve)}")
                         cube.undo(len(solve))
                         cube.play(*solve)
                     else:
-                        print('SOLUTION: No moves')
+                        print("SOLUTION: No moves")
 
                     if len(stats) > 5:
                         print()
 
                     for stat in stats:
-                        if stat in ('HTM', 'TIME'):
+                        if stat in {'HTM', 'TIME'}:
                             print()
                         if stats[stat] == '':
-                            print(f'{stat}: None')
+                            print(f"{stat}: None")
                         elif stat == 'TIME':
-                            print(f'{stat}: {stats[stat]:.6f}')
+                            print(f"{stat}: {stats[stat]:.6f}")
                         else:
-                            print(f'{stat}: {stats[stat]}')
+                            print(f"{stat}: {stats[stat]}")
 
             elif function == 'SPEEDSOLVE':
                 os.system('cls')
@@ -252,20 +308,20 @@ Enter HELP for list of functions.\
                 cube.show()
                 print()
 
-                if not result['TIME'][0] == 'D':
-                    print('Solved!')
+                if not result['TIME'].startswith('D'):
+                    print("Solved!")
 
-                print(f'TIME: {result["TIME"]}')
-                print('\nMOVECOUNT:')
+                print(f"TIME: {result['TIME']}")
+                print("\nMOVECOUNT:")
                 for stat in 'HTM', 'QTM', 'STM', 'ETM':
-                    print(f'{stat}: {result[stat]}')
+                    print(f"{stat}: {result[stat]}")
 
                 print()
 
                 for stat in 'TPS', 'START TIME', 'END TIME':
                     print(f'{stat}: {result[stat]}')
 
-        #Attributes
+        # Attributes
         elif function == 'CUBE':
             print(''.join(x for s in cube.cube for y in s for x in y))
 
@@ -273,40 +329,38 @@ Enter HELP for list of functions.\
             print(cube.size)
 
         elif function == 'MOVES':
-            if len(cube.moves) == 0:
-                print('No moves.')
+            if not cube.moves:
+                print("No moves.")
             else:
                 print(' '.join(cube.moves))
 
         elif function == 'SMOVES':
-            if len(cube.smoves) == 0:
-                print('No moves.')
+            if not cube.smoves:
+                print("No moves.")
             else:
                 print(' '.join(cube.smoves))
 
         elif function == 'SHOWSTYLE':
-            for info in cube.showstyle:
-                print(f'{info}: {cube.showstyle[info]}')
+            for key, data in cube.show_style.items():
+                print(f"{key}: {data}")
 
         elif function == 'COLOURS':
             for side, (r,g,b) in cube.colours.items():
-                print(f'{side}: #{r:02x}{g:02x}{b:02x} or {r}, {g}, {b}')
+                print(f"{side}: #{r:02x}{g:02x}{b:02x} or {r},{g},{b}")
 
-        #Moves
+        # Moves
         else:
             try:
                 moves = parse_moves(moves)
                 cube.move(moves)
-            except Cube.MoveError as e:
-                print(f'{e}\n')
-                continue
+            except MoveError as e:
+                print(e)
+            else:
+                cube.show()
 
-            cube.show()
-
-        print()
 
 if __name__ == '__main__':
     try:
         freeplay()
     except (EOFError, KeyboardInterrupt):
-        exit()
+        raise SystemExit

@@ -1,9 +1,13 @@
-Python 3.6+
+Python 3.8+
 
-Required Python packages
-
+The program uses the following built-in modules:
+ast
+importlib
 os
 math
+random
+statistics
 time
 timeit
+tkinter
 turtle
