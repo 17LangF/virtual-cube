@@ -1,20 +1,34 @@
-'''
-Virtual Cube Program - Made by Fred Lang.
-Old Pochmann solver.
-'''
+"""Solve a 2x2 or 3x3 cube with the Old Pochmann method."""
 
 from cube.functions import reverse
 
-#Old Pochmann
-def op(self):
+
+def op(self) -> tuple:
+    """
+    Solve cube with the Old Pochmann method.
+
+    Returns
+    -------
+    tuple of (list of str, dict of {str: int or str})
+        Moves to solve cube, statistics of `op_edges`, parity ('EVEN' or
+        'ODD'), and `op_corners`.
+
+    Notes
+    -----
+    Solve cube using setup moves and swaps. Edges are solved first using
+    the T-permutation with buffer at B. If there is an odd number of
+    edge swaps, there is parity which is solved using the
+    Ra-permutation: `R U' R' U' R U R D R' U' R D' R' U2 R' U'`. Corners
+    are then solved using an altered Y-permutation with buffer at A.
+
+    The piece swaps are described using the Speffz letter scheme.
+    """
     solve, stats = op_edges(self)
 
     if len(stats['EDGE MEMO']) % 3 == 1:
         parity_alg = "R U' R' U' R U R D R' U' R D' R' U2 R' U'".split()
-
         self.move(parity_alg)
         solve.extend(parity_alg)
-
         stats['PARITY'] = 'ODD'
     else:
         stats['PARITY'] = 'EVEN'
@@ -22,21 +36,56 @@ def op(self):
     step_solve, step_stats = op_corners(self)
     solve.extend(step_solve)
     stats.update(step_stats)
-
     return solve, stats
 
-#Old Pochmann corners
-def op_corners(self):
+
+def op_corners(self) -> tuple:
+    """
+    Solve the corners of the cube with the Old Pochmann method.
+
+    Returns
+    -------
+    tuple of (list of str, dict of {'OP CORNERS': int, 'CORNER MEMO':
+    str})
+        Moves to solve corners, statistics (move count in ETM, piece
+        swaps using the Speffz letter scheme).
+
+    Notes
+    -----
+    Solve corners using an altered Y-permutation with buffer at A.
+
+    Look at the sticker in the buffer location (A) and find where this
+    sticker goes. Memorise this location as a letter.
+
+    Now look at the sticker in the location last memorised, memorise
+    where this sticker goes. Repeat until the buffer piece is reached
+    completing a cycle.
+
+    If there are still corner pieces which have not been reached,
+    memorise a sticker of one of these pieces and start a new cycle,
+    memorising letters as before. The cycle ends when the starting piece
+    of the cycle is memorised again.
+
+    Repeat until all corner pieces have been reached.
+
+    Remove any pairs of consecutive letters which are the same.
+
+    For each memorised letter, do setup moves to move the sticker to the
+    target location (P), do the corner swapping algorithm which swaps A
+    with P, then undo the setup moves. Use only `F`, `R`, and `D` moves
+    for the setup moves. The corner swapping algorithm is an altered
+    Y-permutation: `R U' R' U' R U R' F' R U R' U' R' F R`.
+
+    All corners should be solved.
+    """
     cube = self.cube
     size = self.size
     solve = []
     stats = {}
-
-    if size > 2:
-        faces = [side[1][1] for side in cube]
-    else:
+    if size == 2:
         faces = 'ULFRBD'
-
+    else:
+        faces = [side[1][1] for side in cube]
     corners = {
         'A': ((0,0,0), (4,0,-1), (1,0,0), "BUFFER"),
         'B': ((0,0,-1), (3,0,-1), (4,0,0), "R D'"),
@@ -63,25 +112,24 @@ def op_corners(self):
         'W': ((5,-1,-1), (4,-1,0), (3,-1,-1), "D2 F'"),
         'X': ((5,-1,0), (1,-1,0), (4,-1,-1), "D F'")
     }
-
     corner = 'A'
     corner_memo = []
     solved_corners = []
 
+    # Memorisation phase
     while len(solved_corners) < 21:
         corner = corners[corner]
         corner = (cube[corner[0][0]][corner[0][1]][corner[0][2]],
                   cube[corner[1][0]][corner[1][1]][corner[1][2]],
                   cube[corner[2][0]][corner[2][1]][corner[2][2]])
-        corner = tuple(faces.index(i) for i in corner)
+        corner = tuple([faces.index(i) for i in corner])
 
         for possible_corner in corners:
-            if (tuple(corners[possible_corner][i][0] for i in range(3))
-                == corner):
+            if tuple(zip(*corners[possible_corner][:3]))[0] == corner:
                 corner = possible_corner
                 break
 
-        #New cycle
+        # New cycle
         if corners[corner][3] == 'BUFFER':
             for possible_corner in corners:
                 if corners[possible_corner][3] == 'BUFFER':
@@ -91,13 +139,12 @@ def op_corners(self):
                     corner = possible_corner
                     break
 
-        #End cycle
+        # End cycle
         elif corners[corner][0] in solved_corners:
             corner_memo.append(corner)
             for possible_corner in corners:
                 if corners[possible_corner][3] == 'BUFFER':
                     continue
-
                 if corners[possible_corner][0] not in solved_corners:
                     corner = possible_corner
                     break
@@ -108,10 +155,10 @@ def op_corners(self):
     corner = corners[corner]
     corner = (cube[corner[0][0]][corner[0][1]][corner[0][2]],
               cube[corner[1][0]][corner[1][1]][corner[1][2]])
-    corner = tuple(faces.index(i) for i in corner)
+    corner = tuple([faces.index(i) for i in corner])
 
     for possible_corner in corners:
-        if tuple(corners[possible_corner][i][0] for i in [0,1]) == corner:
+        if tuple([corners[possible_corner][i][0] for i in (0, 1)]) == corner:
             corner = possible_corner
             break
 
@@ -127,13 +174,12 @@ def op_corners(self):
 
     corner_alg = "R U' R' U' R U R' F' R U R' U' R' F R".split()
 
+    # Blindfolded phase
     for corner in corner_memo:
         setup = corners[corner][3].split()
-
         if not setup:
             solve.extend(corner_alg)
             continue
-
         solve.extend(setup)
         solve.extend(corner_alg)
         solve.extend(reverse(setup))
@@ -142,25 +188,56 @@ def op_corners(self):
         solve = [f'{size-1}{move}' if 'w' in move else move for move in solve]
 
     self.move(solve)
-
     stats['OP CORNERS'] = len(solve)
-
     corner_memo = iter(corner_memo)
-    corner_memo = [letter + next(corner_memo,'') for letter in corner_memo]
-
+    corner_memo = [letter + next(corner_memo, '') for letter in corner_memo]
     stats['CORNER MEMO'] = ' '.join(corner_memo)
-
     return solve, stats
 
-#Old Pochmann edges
-def op_edges(self):
+
+def op_edges(self) -> tuple:
+    """
+    Solve the edges of the cube with the Old Pochmann method.
+
+    Returns
+    -------
+    tuple of (list of str, dict of {'OP EDGES': int, 'EDGE MEMO': str})
+        Moves to solve edges, statistics (move count in ETM, piece swaps
+        using the Speffz letter scheme).
+
+    Notes
+    -----
+    Solve edges using the T-permutation with buffer at B.
+
+    Look at the sticker in the buffer location (B) and find where this
+    sticker goes. Memorise this location as a letter.
+
+    Now look at the sticker in the location last memorised, memorise
+    where this sticker goes. Repeat until the buffer piece is reached
+    completing a cycle.
+
+    If there are still edge pieces which have not been reached, memorise
+    a sticker of one of these pieces and start a new cycle, memorising
+    letters as before. The cycle ends when the starting piece of the
+    cycle is memorised again.
+
+    Repeat until all edge pieces have been reached.
+
+    Remove any pairs of consecutive letters which are the same.
+
+    For each memorised letter, do setup moves to move the sticker to the
+    target location (D), do the edge swapping algorithm which swaps B
+    with D, then undo the setup moves. Use only `L`, `Lw`, `D`, and `Dw`
+    moves for the setup moves. The edge swapping algorithm is the
+    T-permutation: `R U R' U' R' F R2 U' R' U' R U R' F'`.
+
+    All edges should be solved.
+    """
     cube = self.cube
     size = self.size
     solve = []
     stats = {}
-
     faces = [side[1][1] for side in cube]
-
     edges = {
         'A': ((0,0,1), (4,0,1), "Lw2 D' L2"),
         'B': ((0,1,-1), (3,0,1), 'BUFFER'),
@@ -187,23 +264,23 @@ def op_edges(self):
         'W': ((5,-1,1), (4,-1,1), 'D L2'),
         'X': ((5,1,0), (1,-1,1), 'L2')
     }
-
     edge = 'B'
     edge_memo = []
     solved_edges = []
 
+    # Memorisation phase
     while len(solved_edges) < 22:
         edge = edges[edge]
         edge = (cube[edge[0][0]][edge[0][1]][edge[0][2]],
                 cube[edge[1][0]][edge[1][1]][edge[1][2]])
-        edge = tuple(faces.index(i) for i in edge)
+        edge = tuple([faces.index(i) for i in edge])
 
         for possible_edge in edges:
-            if tuple(edges[possible_edge][i][0] for i in [0,1]) == edge:
+            if tuple(zip(*edges[possible_edge][:2]))[0] == edge:
                 edge = possible_edge
                 break
 
-        #New cycle
+        # New cycle
         if edges[edge][2] == 'BUFFER':
             for possible_edge in edges:
                 if edges[possible_edge][2] == 'BUFFER':
@@ -213,7 +290,7 @@ def op_edges(self):
                     edge = possible_edge
                     break
 
-        #End cycle
+        # End cycle
         elif edges[edge][0] in solved_edges:
             edge_memo.append(edge)
             for possible_edge in edges:
@@ -230,10 +307,10 @@ def op_edges(self):
     edge = edges[edge]
     edge = (cube[edge[0][0]][edge[0][1]][edge[0][2]],
             cube[edge[1][0]][edge[1][1]][edge[1][2]])
-    edge = tuple(faces.index(i) for i in edge)
+    edge = tuple([faces.index(i) for i in edge])
 
     for possible_edge in edges:
-        if tuple(edges[possible_edge][i][0] for i in [0,1]) == edge:
+        if tuple([edges[possible_edge][i][0] for i in (0, 1)]) == edge:
             edge = possible_edge
             break
 
@@ -249,13 +326,12 @@ def op_edges(self):
 
     edge_alg = "R U R' U' R' F R2 U' R' U' R U R' F'".split()
 
+    # Blindfolded phase
     for edge in edge_memo:
         setup = edges[edge][2].split()
-
         if not setup:
             solve.extend(edge_alg)
             continue
-
         solve.extend(setup)
         solve.extend(edge_alg)
         solve.extend(reverse(setup))
@@ -264,12 +340,8 @@ def op_edges(self):
         solve = [f'{size-1}{move}' if 'w' in move else move for move in solve]
 
     self.move(solve)
-
     stats['OP EDGES'] = len(solve)
-
     edge_memo = iter(edge_memo)
-    edge_memo = [letter + next(edge_memo,'') for letter in edge_memo]
-
+    edge_memo = [letter + next(edge_memo, '') for letter in edge_memo]
     stats['EDGE MEMO'] = ' '.join(edge_memo)
-
     return solve, stats
