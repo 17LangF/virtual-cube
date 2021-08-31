@@ -1,0 +1,525 @@
+<GENERAL>
+For more information on a specific function, type HELP function.
+Functions are not case-sensitive.
+
+Cube functions:
+COLOUR        Change the colour of a side of the cube.
+EXIT          Exit program.
+HELP          Return help page for a given function.
+INPUT         Set the state of the cube.
+INVERT        Switch to the inverse scramble and reverse moves.
+LINK          Return an alg.cubing.net link for the cube.
+LOAD          Load a cube from a previously saved file.
+MIRROR        Mirror all previous moves and scramble moves across a plane.
+MOVECOUNT     Return current move count.
+PLAY          Play through moves one at a time.
+REPEAT        Repeat moves until solved or when the limit is reached.
+RESET         Reset cube and set cube size.
+SAVE          Save cube attributes to a file.
+SCRAMBLE      Reset and scramble cube with a given scramble or method.
+SHOW          Show cube.
+SIMPLIFY      Simplify moves.
+SOLVE         Compute a solution to solve the cube using a given method.
+SPEEDSOLVE    Solve the cube as fast as you can and give statistics on solve.
+UNDO          Reverse last move or last number of moves.
+
+Help sheets:
+NOTATION      Explain cube notation.
+METRICS       Explain different turn metrics.
+
+Cube attributes:
+CUBE          Return the cube state as a string.
+SIZE          Return cube size.
+MOVES         Return moves.
+SMOVES        Return scramble/setup moves.
+SHOWSTYLE     Return current style to show the cube.
+COLOURS       Return colour scheme of the cube in RGB.
+</GENERAL>
+
+<COLOUR>
+COLOUR side colour
+(Default colours are listed below)
+
+Change the colour of a side of the cube.
+
+The side must be one of U, L, F, R, B, D.
+
+The colour must be entered in either:
+    HEX: e.g., #ffffff
+    RGB: e.g., 255,255,255
+    Name: e.g., white
+
+The default colours for each side are:
+    U: #ffffff or 255,255,255 or white
+    L: #ffa500 or 255,165,0 or orange
+    F: #008000 or 0,128,0 or green
+    R: #ff0000 or 255,0,0 or red
+    B: #0000ff or 0,0,255 or blue
+    D: #ffff00 or 255,255,0 or yellow
+
+The allowed named colours are:
+    white: 255,255,255
+    black: 0,0,0
+    red: 255,0,0
+    orange: 255,165,0
+    yellow: 255,255,0
+    green: 0,128,0
+    blue: 0,0,255
+    purple: 128,0,128
+    magenta: 255,0,255
+    pink: 255,192,203
+    cyan: 0,255,255
+    brown: 165,42,42
+    grey: 128,128,128
+    gray: 128,128,128
+</COLOUR>
+
+<EXIT>
+EXIT
+
+Exit program.
+
+Ctrl+C also exits the program.
+</EXIT>
+
+<HELP>
+HELP function
+(Default function='GENERAL').
+
+Return help page for a given function.
+</HELP>
+
+<INPUT>
+INPUT state
+
+Set the state of the cube.
+
+Enter the colours of your cube starting from the U face, followed by the L, F,
+R, B, and D faces, left to right, top to bottom. For an NxN cube, state should
+be of length 6 * N^2.
+
+If the cube state is not solvable, then the program will give a reason why.
+
+Using this may cause problems with other functions.
+</INPUT>
+
+<INVERT>
+INVERT
+
+Switch to the inverse scramble and reverse moves.
+
+Scramble moves become the inverse of the current moves.
+Current moves become the inverse of the scramble moves.
+</INVERT>
+
+<LOAD>
+LOAD filename
+(Default filename='Cube').
+
+Load a cube from a previously saved file.
+
+The file should be a txt file located in the 'saves' folder created by the SAVE
+function.
+</LOAD>
+
+<LINK>
+LINK
+
+Return an alg.cubing.net link for the cube.
+
+Size must be from 1x1 to 17x17 to be supported by alg.cubing.net.
+</LINK>
+
+<MIRROR>
+MIRROR plane
+(Default plane='M').
+
+Mirror all previous moves and scramble moves across a plane (M, E, or S).
+If plane = 'M', the moves are mirrored left to right.
+If plane = 'E', the moves are mirrored top to bottom.
+If plane = 'S', the moves are mirrored front to back.
+</MIRROR>
+
+<MOVECOUNT>
+MOVECOUNT metric
+(Default metric='OVERVIEW').
+
+Return current move count (use HELP METRICS for an explanation of different
+turn metrics).
+
+MOVECOUNT OVERVIEW - Return move count in HTM, QTM, STM, and ETM.
+MOVECOUNT ALL - Return move count in all metrics.
+</MOVECOUNT>
+
+<PLAY>
+PLAY moves
+
+Play through moves one at a time.
+
+Enter key - step through the moves one at a time.
+EXIT or Ctrl+C - skip to the end of the moves.
+PLAY tps - animate the moves (this should only be used in 3D SHOW mode).
+    (Default tps=size ^ 2 / 2 + 1).
+    If tps is 0, then the moves are played at maximum speed.
+    If tps is xN, then the moves are played N times the default speed.
+
+Moves may play slower than the given tps for large cube sizes as it takes more
+time to show larger cubes.
+</PLAY>
+
+<REPEAT>
+REPEAT moves limit
+(Default limit=1260).
+
+Repeat moves until solved or when the limit is reached.
+</REPEAT>
+
+<RESET>
+RESET size
+(Default size='ALL').
+
+Reset cube and set cube size.
+
+The cube state, moves, and scramble moves are reset.
+If size = 'ALL', then all attributes are reset.
+
+Some functions may become very slow if the cube is too large.
+</RESET>
+
+<SAVE>
+SAVE filename
+(Default filename='Cube' followed by the next available number).
+
+Save cube attributes to a file.
+
+The file is saved in the 'saves' folder as a txt file which can be loaded by
+the LOAD function.
+</SAVE>
+
+<SCRAMBLE>
+SCRAMBLE scramble
+(Default scramble='MOVES').
+
+Reset and scramble cube with a given scramble or method.
+
+Scramble methods include:
+MOVES length - Random moves scrambler. (Default lengths are shown below).
+STATE - Random state scrambler. Only available for 1x1 and 2x2 currently.
+
+The random number generator can be initialised by entering a seed after the
+keyword SEED.
+
+Or enter scramble after the keyword SCRAMBLE to follow the inputted scramble.
+
+Default scramble lengths for random moves:
+    0x0: 25
+    1x1: 25
+    2x2: 15
+    3x3: 25
+    4x4: 40
+    5x5: 60
+    6x6: 80
+    7x7: 100
+
+In general, an NxN cube larger than a 3x3 has scramble length 20 * (N-2).
+
+The scramble is played using the PLAY function. Use HELP PLAY for more
+information.
+</SCRAMBLE>
+
+<SHOW>
+SHOW show_style
+(Default show_style is the last show_style used).
+
+Show cube.
+
+SHOW 3D - use Python Turtle to display a 3D drawing of the cube.
+SHOW 2D - print cube in the terminal as a 2D net.
+
+In 3D mode:
+SHOW xr yr zc zoom
+(Default xr=38, yr=28, zc=0.1, zoom=180, pensize=9).
+
+xr - the angle of rotation about the x axis in degrees. -38 <= xr <= 38.
+yr - the angle of rotation about the y axis in degrees. -45 <= yr <= 45.
+zc - the size difference between close and far points.
+zoom - how much larger the picture is drawn. Negative inverts drawing.
+pensize - thickness of the black lines. Default is abs(zoom) / (5 * size + 5).
+
+Clicking on the drawing moves the drawing around so that the F face moves
+towards the mouse.
+
+In 2D mode:
+SHOW sticker colour_code spaces
+(Default sticker='██', colour_code='fg,colour', spaces=True).
+
+If sticker is 'letters', then the stickers will be shown with letters.
+Use 'block' for two block characters ██.
+
+If spaces is True, then the faces will be separated.
+
+If an argument is not given, the last used value is used.
+
+Colour codes:
+    colour: Colour of sticker in R,G,B
+    fg: Foreground colour (38,2) followed by colour in R,G,B.
+    bg: Background colour (48,2) followed by colour in R,G,B.
+    0: No colour
+    4: Underline
+
+Colour codes are separated with commas.
+</SHOW>
+
+<SIMPLIFY>
+SIMPLIFY move_types
+(Default move_types='ALL').
+
+Simplify moves.
+
+Move types:
+    TURNS: reduce the number of 90 degree turns.
+        e.g., U3 becomes U', U4 U5 U6' U7' becomes U U2 U.
+    ADJACENT: cancel adjacent moves where possible.
+        e.g., U U becomes U2, Uw Uw2 becomes Uw'.
+    PARALLEL: cancel moves which are parallel.
+        e.g., L R L becomes L2 R, L Lw L becomes L2 Lw.
+    WIDE: remove wide moves and reduce the depth of turns where possible.
+        e.g., on 3x3, Rw becomes L x. On 5x5, 3Rw becomes Lw x.
+    SLICE: remove slice moves.
+        e.g., on 3x3, M becomes L' Lw. On 5x5, 2-3Rw becomes R' 3Rw.
+    ROTATION: move all rotations to the end and simplify them.
+        e.g., x U becomes F x, x2 y2 becomes z2.
+    ALL: combine all the above.
+
+Move types can be combined, so to remove wide and slice moves enter:
+SIMPLIFY WIDE SLICE
+
+Moves are simplified in the order of SLICE, WIDE, ROTATION, PARALLEL, ADJACENT,
+TURNS.
+</SIMPLIFY>
+
+<SOLVE>
+SOLVE method cubes
+(Default method is the first method below for the current cube size, cubes=1).
+
+Compute a solution to solve the cube using a given method.
+
+Statistics include:
+    MOVECOUNT:  move count of solve in HTM, QTM, STM, and ETM.
+    TIME: time the program took to find a solution.
+
+    The move count in ETM for each substep in the method.
+
+    When solving multiple cubes, the cube is repeatedly scrambled and solved.
+    The average (mean and standard deviation), best and worst statistics, and
+    the total time to scramble and solve is shown.
+
+    For Old Pochmann, the piece swaps are described using the Speffz letter
+    scheme.
+
+Methods for different cube sizes:
+2x2 - OPTIMAL
+    Solve cube in as few moves as possible. Solutions are 3-gen, so only use U,
+    F, and R moves. Note: the first solve will be significantly slower than
+    average for the program to read the file.
+
+2x2 - OP or OLD POCHMANN
+    Solve cube using setup moves and swaps. Corners are solved using an altered
+    Y-permutation with buffer at A.
+
+3x3 - CFOP or FRIDRICH
+    Solve cube using the CFOP or Fridrich method.
+
+3x3 - BEGINNERS
+    Solve cube using the beginner's method shown in my YouTube tutorial at
+    https://www.youtube.com/playlist?list=PLK2USJVFiYlPh9ZGiMBE3Qd4fzomnM0Qw.
+
+3x3 - OP or OLD POCHMANN
+    Solve cube using setup moves and swaps. Edges are solved using the
+    T-permutation with buffer at B. Parity is solved using the Ra-permutation.
+    Corners are solved using an altered Y-permutation with buffer at A.
+
+3x3 - THISTLETHWAITE
+    Solve cube using Thistlethwaite's algorithm.
+
+3x3 - OPTIMAL
+    Solve cube in as few moves as possible using a brute-force method. The more
+    moves required to solve, the longer it will take to find a solution.
+
+3x3 Substeps:
+    CROSS: cross
+    FIRST LAYER: cross, first layer corners
+    F2L: cross, F2L
+    OLL: cross, F2L, OLL
+    CORNERS: Old Pochmann corners
+    EDGES: Old Pochmann edges
+    EDGE ORIENTATION: g1
+    DOMINO REDUCTION: g1, g2
+    HALF TURN REDUCTION: g1, g2, g3
+
+4x4+ - CAGE
+    Solve cube by solving edges first, using commutators to solve centres, and
+    then solving the cube as a 3x3 using CFOP.
+
+4x4+ - OPTIMAL
+    Solve cube in as few moves as possible using a brute-force method. The more
+    moves required to solve, the longer it will take to find a solution.
+
+4x4+ Substeps:
+    EDGES: edges
+    CENTRES: centres preserving edges
+    REDUCTION: edges, centres
+
+The solve is executed using the PLAY function. Use HELP PLAY for more
+information.
+</SOLVE>
+
+<SPEEDSOLVE>
+SPEEDSOLVE
+
+Solve the cube as fast as you can and give statistics on solve.
+
+The cube is scrambled with the default method, and will start timing once the
+first turn is made, or once 15 seconds (inspection) is reached.
+
+Enter moves to solve the cube. Other functions include:
+    EXIT: end solve.
+    TIME: return current solving time.
+
+Solve times are shown in the format days:hours:minutes:seconds.milliseconds
+with leading 0s removed.
+
+Statistics include:
+    TIME: result of the solve, either time, DNF(time) or DNS.
+    MOVECOUNT: move count of solve in HTM, QTM, STM, and ETM.
+    TPS: average turns per second, calculated using ETM.
+    START TIME: time the cube is first seen.
+    END TIME: time solve is ended.
+</SPEEDSOLVE>
+
+<UNDO>
+UNDO number
+(Default number=1).
+
+Reverse last move or last number of moves.
+If number is 'ALL' then all moves are reversed.
+</UNDO>
+
+<NOTATION>
+NOTATION
+
+Face turns:
+    U: Up
+    L: Left
+    F: Front
+    R: Right
+    B: Back
+    D: Down
+
+    Add a number to say how many times to turn that layer clockwise, e.g., U2.
+    Add an apostrophe to turn the layer anticlockwise, e.g., U'.
+
+Wide moves:
+    Add the letter 'w' to a face turn to turn 2 layers at once, e.g., Uw.
+    Alternatively, using a lowercase letter also turns 2 layers at once, e.g.,
+    u.
+
+    Add a number in front of the face turn to specify the number of layers to
+    turn, e.g., 3Uw or 3u.
+
+Wide block moves:
+    Specify the start and end move depth separated by a hyphen in front of the
+    wide face turn, e.g., 2-3Uw or 2-3u.
+
+Slice moves:
+    M: Middle (follows L)
+    E: Equator (follows D)
+    S: Slice (follows F)
+
+    A capital slice move turns only the central layer.
+    A lowercase slice move turns everything but the two outer layers.
+
+    To turn a specific layer, add a number in front of a face turn, e.g., 2U.
+
+Rotations:
+    x: x-axis (follows R)
+    y: y-axis (follows U)
+    z: z-axis (follows F)
+
+    These turn the whole cube.
+
+The program also allows:
+    Grouping: using round brackets, e.g., (R U R' U').
+    Repetition: using a number after a bracket, e.g., (R U R' U')3.
+    Reversing: using an apostrophe after a bracket, e.g., (R U R' U')'.
+    Commutators: using square brackets with a comma, e.g., [R, U].
+    Conjugates: using square brackets with a colon, e.g., [R: U].
+</NOTATION>
+
+<METRICS>
+METRICS
+
+HTM - Half Turn Metric or Outer Block Turn Metric
+In HTM a move can any outer turn.
+So U is 1HTM, U2 is 1HTM, M is 2HTM, M2 is 2HTM, and x is 0HTM.
+
+QTM - Quarter Turn Metric
+In QTM a move must be an outer quarter turn.
+So U is 1QTM, U2 is 2QTM, M is 2QTM, M2 is 4QTM, and x is 0QTM.
+
+STM - Slice Turn Metric or Block Turn Metric
+In STM a move can be any outer turn or slice move.
+So U is 1STM, U2 is 1STM, M is 1STM, M2 is 1STM, and x is 0STM.
+
+ETM - Execution Turn Metric
+In ETM a move can be any outer turn or slice move, and rotations are counted.
+So U is 1ETM, U2 is 1ETM, M is 1ETM, M2 is 1ETM, and x is 1ETM.
+
+QSTM - Quarter Slice Turn Metric
+In QTSM a move can be an outer quarter turn or quarter slice move.
+So U is 1QSTM, U2 is 2QTSM, M is 1QTSM, M2 is 2QTSM, and x is 0QTSM.
+
+ATM - Axis Turn Metric
+In ATM a move can be any turn within the same axis.
+So U is 1ATM, U2 is 1ATM, M is 1ATM, M2 is 1ATM, x is 0ATM and L R is 1ATM.
+</METRICS>
+
+<CUBE>
+CUBE
+
+Return the current cube state as a string, starting from the U face, followed
+by the L, F, R, B, and D faces, left to right, top to bottom.
+
+This can be used to export the cube state, which can be imported using the
+INPUT function.
+</CUBE>
+
+<SIZE>
+SIZE
+
+Return current cube size.
+</SIZE>
+
+<MOVES>
+MOVES
+
+Return current moves.
+</MOVES>
+
+<SMOVES>
+SMOVES
+
+Return current scramble/setup moves.
+</SMOVES>
+
+<SHOWSTYLE>
+SHOWSTYLE
+
+Return current style to show the cube.
+</SHOWSTYLE>
+
+<COLOURS>
+COLOURS
+
+Return current colour scheme in HEX and RGB.
+</COLOURS>
