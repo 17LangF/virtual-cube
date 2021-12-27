@@ -53,7 +53,7 @@ def ida_star(self, estimate, next_faces, max_depth=float('inf')):
                     moves.append(move)
                     depth = search(moves, maximum)
 
-                    if depth == True:
+                    if depth is True:
                         return True
                     if depth < minimum:
                         minimum = maximum
@@ -84,7 +84,7 @@ def ida_star(self, estimate, next_faces, max_depth=float('inf')):
 
     while True:
         depth = search(moves, maximum)
-        if depth == True:
+        if depth is True:
             return moves
         if depth > max_depth:
             return False
