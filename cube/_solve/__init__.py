@@ -189,13 +189,13 @@ def solve(self, *method: str, cubes: int = 1) -> tuple:
             new_stats = {}
             for step in methods[size][method]:
                 step_solve, step_stats = step(self)
-                if step_solve == False:
+                if step_solve is False:
                     raise CubeError("Could not solve.")
                 solve.extend(step_solve)
                 new_stats.update(step_stats)
         else:
             solve, new_stats = methods[size][method](self)
-            if solve == False:
+            if solve is False:
                 raise CubeError("Could not solve.")
 
         new_stats.update(self.movecount(solve))
